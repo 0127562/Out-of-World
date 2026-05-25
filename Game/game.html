@@ -3,7 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Factory Sandbox Engine</title>
+
+<title>Factory Sandbox</title>
 
 <style>
 
@@ -33,10 +34,10 @@ top:10px;
 left:10px;
 width:320px;
 background:#000000bb;
-backdrop-filter:blur(6px);
 padding:14px;
 border-radius:18px;
 z-index:10;
+backdrop-filter:blur(5px);
 }
 
 #toolbar{
@@ -71,6 +72,7 @@ font-size:14px;
 <body>
 
 <div id="ui">
+
 <h2>🏭 Factory Sandbox</h2>
 
 <div id="toolbar">
@@ -86,8 +88,7 @@ font-size:14px;
 <p style="margin-top:10px;font-size:13px">
 WASD — камера<br>
 ЛКМ — будувати<br>
-ПКМ — видалити<br>
-16x16 sprite system
+ПКМ — видалити
 </p>
 
 </div>
@@ -96,20 +97,23 @@ WASD — камера<br>
 
 <script>
 
-// =========================================
+// ========================================
 // CONFIG
-// =========================================
+// ========================================
 
-const TILE = 16
+const TILE = 32
+const SCALE = 2
+
 const MAP_W = 160
 const MAP_H = 160
 
-// =========================================
+// ========================================
 // CANVAS
-// =========================================
+// ========================================
 
 const canvas = document.getElementById("game")
 const ctx = canvas.getContext("2d")
+
 ctx.imageSmoothingEnabled = false
 
 function resize(){
@@ -118,26 +122,32 @@ canvas.height = window.innerHeight
 }
 
 resize()
+
 window.addEventListener("resize",resize)
 
-// =========================================
+// ========================================
 // SPRITES
-// =========================================
+// ========================================
 
 const sprites = {}
 
 const spriteFiles = {
+
+grass:"sprites/grass.png",
+iron:"sprites/iron.png",
+
 core:"sprites/core.png",
-enemyBase:"sprites/enemy_base.png",
 enemy:"sprites/enemy.png",
-wall:"sprites/wall.png",
+enemyBase:"sprites/enemy_base.png",
+
 belt:"sprites/belt.png",
 miner:"sprites/miner.png",
 turret:"sprites/turret.png",
+wall:"sprites/wall.png",
 generator:"sprites/generator.png",
-iron:"sprites/iron.png",
-grass:"sprites/grass.png",
+
 bullet:"sprites/bullet.png"
+
 }
 
 function loadSprites(){
@@ -145,21 +155,24 @@ function loadSprites(){
 for(const key in spriteFiles){
 
 const img = new Image()
+
 img.src = spriteFiles[key]
 
-img.onerror = () => {
+img.onerror = ()=>{
 console.warn("Missing sprite:",spriteFiles[key])
 }
 
 sprites[key] = img
+
 }
+
 }
 
 loadSprites()
 
-// =========================================
-// MAP
-// =========================================
+// ========================================
+// WORLD
+// ========================================
 
 const world = []
 
@@ -168,7 +181,8 @@ return Math.abs(Math.sin(x*17.12+y*91.17)*9999)%1
 }
 
 for(let y=0;y<MAP_H;y++){
-world[y]=[]
+
+world[y] = []
 
 for(let x=0;x<MAP_W;x++){
 
@@ -178,16 +192,18 @@ if(noise(x,y) > 0.83){
 ore = "iron"
 }
 
-world[y][x]={
+world[y][x] = {
 ore,
 building:null
 }
-}
+
 }
 
-// =========================================
+}
+
+// ========================================
 // CORE
-// =========================================
+// ========================================
 
 const core = {
 x:Math.floor(MAP_W/2),
@@ -195,39 +211,21 @@ y:Math.floor(MAP_H/2),
 hp:1000
 }
 
-// =========================================
+// ========================================
 // ENEMY BASE
-// =========================================
+// ========================================
 
 const enemyBase = {
-x:10,
-y:10,
-timer:0
+x:8,
+y:8
 }
 
-// =========================================
-// ENTITIES
-// =========================================
-
-const enemies = []
-const bullets = []
-const items = []
-
-// =========================================
-// RESOURCES
-// =========================================
-
-const resources = {
-iron:200,
-power:100
-}
-
-// =========================================
+// ========================================
 // CAMERA
-// =========================================
+// ========================================
 
-let cameraX = core.x*TILE - 400
-let cameraY = core.y*TILE - 300
+let cameraX = core.x*TILE - canvas.width/4
+let cameraY = core.y*TILE - canvas.height/4
 
 const keys = {}
 
@@ -241,17 +239,18 @@ keys[e.key.toLowerCase()] = false
 
 function updateCamera(){
 
-const speed = 7
+const speed = 12
 
-if(keys["w"])cameraY -= speed
-if(keys["s"])cameraY += speed
-if(keys["a"])cameraX -= speed
-if(keys["d"])cameraX += speed
+if(keys["w"]) cameraY -= speed
+if(keys["s"]) cameraY += speed
+if(keys["a"]) cameraX -= speed
+if(keys["d"]) cameraX += speed
+
 }
 
-// =========================================
-// BUILDING SYSTEM
-// =========================================
+// ========================================
+// BUILD SYSTEM
+// ========================================
 
 let buildMode = "belt"
 
@@ -266,11 +265,10 @@ kind:type,
 x,
 y,
 hp:100,
-dir:0,
-progress:0,
 reload:0,
-power:0
+progress:0
 }
+
 }
 
 canvas.addEventListener("contextmenu",e=>e.preventDefault())
@@ -279,24 +277,44 @@ canvas.addEventListener("mousedown",handleBuild)
 
 function handleBuild(e){
 
-const tx = Math.floor((e.clientX + cameraX)/TILE)
-const ty = Math.floor((e.clientY + cameraY)/TILE)
+const tx = Math.floor((e.clientX/SCALE + cameraX)/TILE)
+const ty = Math.floor((e.clientY/SCALE + cameraY)/TILE)
 
 if(tx<0||ty<0||tx>=MAP_W||ty>=MAP_H)return
 
-if(e.button === 2){
+if(e.button===2){
+
 world[ty][tx].building = null
 return
+
 }
 
 if(world[ty][tx].building)return
 
 world[ty][tx].building = createBuilding(buildMode,tx,ty)
+
 }
 
-// =========================================
-// ENEMY SPAWNING
-// =========================================
+// ========================================
+// ENTITIES
+// ========================================
+
+const enemies = []
+const bullets = []
+const items = []
+
+// ========================================
+// RESOURCES
+// ========================================
+
+const resources = {
+iron:200,
+power:100
+}
+
+// ========================================
+// WAVES
+// ========================================
 
 let wave = 1
 
@@ -305,28 +323,38 @@ function spawnWave(){
 for(let i=0;i<wave*4;i++){
 
 enemies.push({
+
 x:enemyBase.x,
 y:enemyBase.y,
+
 hp:60,
+
 path:[],
 moveTimer:0,
 attackTimer:0
+
 })
+
 }
 
 wave++
+
 }
 
-// =========================================
+// ========================================
 // PATHFINDING
-// =========================================
+// ========================================
 
 function findPath(startX,startY,endX,endY){
 
 const queue = []
 const visited = {}
 
-queue.push({x:startX,y:startY,path:[]})
+queue.push({
+x:startX,
+y:startY,
+path:[]
+})
 
 visited[startX+","+startY] = true
 
@@ -358,24 +386,29 @@ if(visited[key])continue
 
 const tile = world[ny][nx]
 
-if(tile.building && tile.building.kind === "wall")continue
+if(tile.building && tile.building.kind==="wall"){
+continue
+}
 
-visited[key]=true
+visited[key] = true
 
 queue.push({
 x:nx,
 y:ny,
 path:[...current.path,{x:nx,y:ny}]
 })
+
 }
+
 }
 
 return []
+
 }
 
-// =========================================
-// ENEMY AI
-// =========================================
+// ========================================
+// ENEMIES
+// ========================================
 
 function updateEnemies(){
 
@@ -397,7 +430,9 @@ const next = enemy.path.shift()
 
 enemy.x = next.x
 enemy.y = next.y
+
 }
+
 }
 
 const tile = world[enemy.y]?.[enemy.x]
@@ -412,27 +447,35 @@ tile.building.hp -= 10
 enemy.attackTimer = 0
 
 if(tile.building.hp <= 0){
+
 tile.building = null
 enemy.path = []
+
 }
+
 }
+
 }
 
 if(enemy.x===core.x && enemy.y===core.y){
 core.hp -= 0.1
 }
+
 }
 
 for(let i=enemies.length-1;i>=0;i--){
+
 if(enemies[i].hp<=0){
 enemies.splice(i,1)
 }
-}
+
 }
 
-// =========================================
-// BUILDINGS UPDATE
-// =========================================
+}
+
+// ========================================
+// BUILDINGS
+// ========================================
 
 function updateBuildings(){
 
@@ -444,60 +487,74 @@ const b = tile.building
 
 if(!b)continue
 
-if(b.kind === "miner"){
+if(b.kind==="miner"){
 
 b.progress++
 
-if(tile.ore === "iron" && b.progress > 120){
+if(tile.ore==="iron" && b.progress>120){
 
 items.push({
 x:x,
-y:y,type:"iron"})
+y:y,
+type:"iron"
+})
 
 b.progress = 0
-}
+
 }
 
-if(b.kind === "generator"){
+}
+
+if(b.kind==="generator"){
 resources.power += 0.03
 }
 
-if(b.kind === "turret"){
+if(b.kind==="turret"){
 
 b.reload--
 
 let target = null
-let dist = 99999
+let dist = 9999
 
 for(const enemy of enemies){
 
-const d = Math.abs(enemy.x - x)+Math.abs(enemy.y-y)
+const d =
+Math.abs(enemy.x-x)+
+Math.abs(enemy.y-y)
 
-if(d < 8 && d < dist){
+if(d<8 && d<dist){
 
 dist = d
 target = enemy
-}
+
 }
 
-if(target && b.reload <= 0){
+}
+
+if(target && b.reload<=0){
 
 bullets.push({
+
 x:x+0.5,
 y:y+0.5,
 target
+
 })
 
 b.reload = 40
+
 }
+
 }
-}
+
 }
 }
 
-// =========================================
+}
+
+// ========================================
 // BULLETS
-// =========================================
+// ========================================
 
 function updateBullets(){
 
@@ -511,23 +568,28 @@ const dist = Math.hypot(dx,dy)
 bullet.x += dx/dist * 0.2
 bullet.y += dy/dist * 0.2
 
-if(dist < 0.3){
+if(dist<0.3){
 
 bullet.target.hp -= 25
 bullet.dead = true
+
 }
+
 }
 
 for(let i=bullets.length-1;i>=0;i--){
+
 if(bullets[i].dead){
 bullets.splice(i,1)
 }
-}
+
 }
 
-// =========================================
+}
+
+// ========================================
 // ITEMS
-// =========================================
+// ========================================
 
 function updateItems(){
 
@@ -535,38 +597,66 @@ for(const item of items){
 
 const tile = world[item.y]?.[item.x]
 
-if(tile?.building?.kind === "belt"){
+if(tile?.building?.kind==="belt"){
 item.x += 0.02
 }
 
-if(Math.floor(item.x)===core.x && Math.floor(item.y)===core.y){
+if(Math.floor(item.x)===core.x &&
+Math.floor(item.y)===core.y){
+
 resources.iron++
 item.dead = true
+
 }
+
 }
 
 for(let i=items.length-1;i>=0;i--){
+
 if(items[i].dead){
 items.splice(i,1)
 }
-}
+
 }
 
-// =========================================
-// DRAWING
-// =========================================
+}
 
-function drawSprite(name,x,y){
+// ========================================
+// DRAW
+// ========================================
+
+function drawSprite(name,worldX,worldY){
 
 const img = sprites[name]
 
+const screenX = (worldX - cameraX) * SCALE
+const screenY = (worldY - cameraY) * SCALE
+
+const size = TILE * SCALE
+
 if(img && img.complete){
-ctx.imageSmoothingEnabled = false
-ctx.drawImage(img,x,y,32,32)
+
+ctx.drawImage(
+img,
+screenX,
+screenY,
+size,
+size
+)
+
 }else{
+
 ctx.fillStyle = "magenta"
-ctx.fillRect(x,y,TILE,TILE)
+
+ctx.fillRect(
+screenX,
+screenY,
+size,
+size
+)
+
 }
+
 }
 
 function drawMap(){
@@ -574,48 +664,61 @@ function drawMap(){
 const startX = Math.floor(cameraX/TILE)
 const startY = Math.floor(cameraY/TILE)
 
-const endX = startX + Math.ceil(canvas.width/TILE)+2
-const endY = startY + Math.ceil(canvas.height/TILE)+2
+const endX =
+startX +
+Math.ceil(canvas.width/(TILE*SCALE))+2
+
+const endY =
+startY +
+Math.ceil(canvas.height/(TILE*SCALE))+2
 
 for(let y=startY;y<endY;y++){
 for(let x=startX;x<endX;x++){
 
 if(x<0||y<0||x>=MAP_W||y>=MAP_H)continue
 
-const px = x*TILE - cameraX
-const py = y*TILE - cameraY
+const worldX = x*TILE
+const worldY = y*TILE
 
 const tile = world[y][x]
 
-drawSprite("grass",px,py)
+drawSprite("grass",worldX,worldY)
 
-if(tile.ore === "iron"){
-drawSprite("iron",px,py)
+if(tile.ore==="iron"){
+drawSprite("iron",worldX,worldY)
 }
 
 if(tile.building){
-drawSprite(tile.building.kind,px,py)
+drawSprite(
+tile.building.kind,
+worldX,
+worldY
+)
+}
+
 }
 }
-}
+
 }
 
 function drawCore(){
 
 drawSprite(
 "core",
-core.x*TILE-cameraX,
-core.y*TILE-cameraY
+core.x*TILE,
+core.y*TILE
 )
+
 }
 
 function drawEnemyBase(){
 
 drawSprite(
 "enemyBase",
-enemyBase.x*TILE-cameraX,
-enemyBase.y*TILE-cameraY
+enemyBase.x*TILE,
+enemyBase.y*TILE
 )
+
 }
 
 function drawEnemies(){
@@ -624,10 +727,12 @@ for(const enemy of enemies){
 
 drawSprite(
 "enemy",
-enemy.x*TILE-cameraX,
-enemy.y*TILE-cameraY
+enemy.x*TILE,
+enemy.y*TILE
 )
+
 }
+
 }
 
 function drawBullets(){
@@ -636,10 +741,12 @@ for(const bullet of bullets){
 
 drawSprite(
 "bullet",
-bullet.x*TILE-cameraX,
-bullet.y*TILE-cameraY
+bullet.x*TILE,
+bullet.y*TILE
 )
+
 }
+
 }
 
 function drawItems(){
@@ -647,24 +754,29 @@ function drawItems(){
 ctx.fillStyle = "white"
 
 for(const item of items){
-ctx.fillRect(
-item.x*TILE-cameraX+6,
-item.y*TILE-cameraY+6,
-4,
-4
-)
+
+const sx =
+(item.x*TILE - cameraX) * SCALE
+
+const sy =
+(item.y*TILE - cameraY) * SCALE
+
+ctx.fillRect(sx+10,sy+10,8,8)
+
 }
+
 }
 
 function drawFog(){
 
-ctx.fillStyle = "rgba(0,0,0,0.25)"
+ctx.fillStyle = "rgba(0,0,0,0.2)"
 ctx.fillRect(0,0,canvas.width,canvas.height)
+
 }
 
-// =========================================
+// ========================================
 // UI
-// =========================================
+// ========================================
 
 function updateUI(){
 
@@ -676,11 +788,12 @@ document.getElementById("stats").innerHTML = `
 👾 Enemies: ${enemies.length}<br>
 🌊 Wave: ${wave}<br>
 `
+
 }
 
-// =========================================
-// GAME LOOP
-// =========================================
+// ========================================
+// LOOP
+// ========================================
 
 let tick = 0
 
@@ -689,6 +802,7 @@ function loop(){
 ctx.clearRect(0,0,canvas.width,canvas.height)
 
 updateCamera()
+
 updateEnemies()
 updateBuildings()
 updateBullets()
@@ -698,7 +812,6 @@ if(tick % 900 === 0){
 spawnWave()
 }
 
-
 drawMap()
 drawCore()
 drawEnemyBase()
@@ -706,16 +819,20 @@ drawEnemies()
 drawBullets()
 drawItems()
 drawFog()
+
 updateUI()
 
-if(core.hp <= 0){
+if(core.hp<=0){
+
 alert("Game Over")
 location.reload()
+
 }
 
 requestAnimationFrame(loop)
 
 tick++
+
 }
 
 spawnWave()
