@@ -1,0 +1,3 @@
+Local=true
+Allow-IP=ТВІЙ_IP
+Site-use-photos=false
