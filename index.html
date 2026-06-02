@@ -13,12 +13,7 @@
 --border:#2b5cff88;
 --text:#ffffff;
 --sub:#b8c7e0;
---blue:#3b82f6;
---purple:#8b5cf6;
---orange:#ff9800;
 --shadow:0 0 25px #2563eb55;
---success:#22c55e;
---error:#ef4444;
 }
 
 body.light{
@@ -148,22 +143,6 @@ margin:0;
 font-weight:900;
 letter-spacing:5px;
 text-transform:uppercase;
-animation:pulse 2.5s infinite;
-}
-
-@keyframes pulse{
-0%{
-transform:scale(1);
-text-shadow:0 0 10px #ffffff44;
-}
-50%{
-transform:scale(1.03);
-text-shadow:0 0 40px #8b5cf6;
-}
-100%{
-transform:scale(1);
-text-shadow:0 0 10px #ffffff44;
-}
 }
 
 header p{
@@ -191,22 +170,10 @@ backdrop-filter:blur(10px);
 padding:35px;
 }
 
-.main-box h2{
-margin-top:0;
-font-size:2rem;
-}
-
-.main-box p,
-.stage-content p{
-line-height:1.8;
-color:var(--sub);
-}
-
 .section-title{
 margin:70px 0 30px;
 text-align:center;
 font-size:2.4rem;
-letter-spacing:2px;
 }
 
 .stage-card{
@@ -226,37 +193,11 @@ width:320px;
 border-radius:16px;
 object-fit:cover;
 border:2px solid #3b82f6;
-box-shadow:0 0 20px #3b82f677,0 0 45px #8b5cf655;
 }
 
 .stage-content h3{
 margin-top:0;
 font-size:2rem;
-}
-
-.download-box{
-display:flex;
-justify-content:center;
-gap:20px;
-flex-wrap:wrap;
-margin:50px 0;
-}
-
-.download-btn{
-padding:18px 35px;
-border:none;
-border-radius:18px;
-cursor:pointer;
-font-size:1.1rem;
-font-weight:800;
-color:white;
-background:linear-gradient(135deg,#7c3aed,#2563eb);
-transition:0.25s;
-}
-
-.download-btn:hover{
-transform:translateY(-4px);
-box-shadow:0 0 25px #8b5cf6aa;
 }
 
 .bottom-grid{
@@ -283,147 +224,29 @@ border-radius:10px;
 background:#7c3aed11;
 }
 
-.loginOverlay{
+#siteBlocked{
+display:none;
 position:fixed;
 inset:0;
-background:#000000d8;
-display:flex;
+background:#000000f2;
+z-index:99999;
 justify-content:center;
 align-items:center;
-z-index:5000;
-backdrop-filter:blur(6px);
+flex-direction:column;
+text-align:center;
 }
 
-.authBox{
-width:380px;
-background:#071226;
-padding:30px;
-border-radius:24px;
-border:1px solid #3b82f655;
-box-shadow:0 0 40px #00000088;
-animation:showBox 0.3s ease;
+#siteBlocked h1{
+font-size:60px;
 }
 
-@keyframes showBox{
-from{
-transform:translateY(20px);
-opacity:0;
-}
-to{
-transform:translateY(0);
-opacity:1;
-}
-}
-
-.authTabs{
-display:flex;
-gap:10px;
-margin-bottom:20px;
-}
-
-.authTab{
-flex:1;
-padding:12px;
-border:none;
-border-radius:12px;
-background:#111c31;
-color:white;
-cursor:pointer;
-font-weight:700;
-transition:0.2s;
-}
-
-.authTab.active{
-background:linear-gradient(135deg,#7c3aed,#2563eb);
-}
-
-.authForm{
-display:none;
-}
-
-.authForm.active{
-display:block;
-}
-
-.authBox input{
-width:100%;
-padding:14px;
-margin-bottom:12px;
-border:none;
-border-radius:12px;
-background:#111c31;
-color:white;
-font-size:15px;
-outline:none;
-border:1px solid transparent;
-transition:0.2s;
-}
-
-.authBox input:focus{
-border-color:#3b82f6;
-}
-
-.authBox button.submitBtn{
-width:100%;
-padding:14px;
-margin-top:5px;
-border:none;
-border-radius:12px;
-background:linear-gradient(135deg,#7c3aed,#2563eb);
-color:white;
-font-weight:700;
-font-size:15px;
-cursor:pointer;
-}
-
-.message{
-margin-top:15px;
-padding:12px;
-border-radius:12px;
-display:none;
-font-size:14px;
-}
-
-.message.success{
-background:#22c55e22;
-color:#86efac;
-border:1px solid #22c55e55;
-display:block;
-}
-
-.message.error{
-background:#ef444422;
-color:#fca5a5;
-border:1px solid #ef444455;
-display:block;
-}
-
-.accountInfo{
-position:fixed;
-bottom:20px;
-right:20px;
-background:#071226ee;
-padding:15px 20px;
-border-radius:18px;
-border:1px solid #3b82f655;
-backdrop-filter:blur(10px);
-display:none;
-z-index:2000;
-}
-
-.accountInfo button{
-margin-top:10px;
-width:100%;
-padding:10px;
-border:none;
-border-radius:10px;
-background:#ef4444;
-color:white;
-cursor:pointer;
-font-weight:700;
+#siteBlocked p{
+font-size:20px;
+opacity:0.8;
 }
 
 @media(max-width:900px){
+
 header h1{
 font-size:3rem;
 }
@@ -440,9 +263,6 @@ width:100%;
 grid-template-columns:1fr;
 }
 
-.authBox{
-width:92%;
-}
 }
 
 </style>
@@ -450,19 +270,27 @@ width:92%;
 
 <body>
 
+<div id="siteBlocked">
+<h1>⛔ ACCESS DENIED</h1>
+<p>Ваш IP не має доступу до цього сайту</p>
+</div>
+
 <nav class="sidebar" id="sidebar">
 <h2>📚 Меню</h2>
+
 <a href="#main">🏠 Основна інформація</a>
 <a href="#stages">⚙ Стадії розвитку</a>
 <a href="#mods">📦 Список модів</a>
-<a href="#team">👥 Опис команди</a>
-<button onclick="openPrivacy()">🔒 Політика конфіденційності</button>
+
+<button onclick="openPrivacy()">
+🔒 Політика конфіденційності
+</button>
+
 </nav>
 
 <div class="top-buttons">
 <button class="top-btn" onclick="toggleSidebar()">☰</button>
 <button class="top-btn" onclick="toggleTheme()">☀</button>
-
 </div>
 
 <header>
@@ -473,100 +301,105 @@ width:92%;
 <div class="container">
 
 <section id="main">
+
 <div class="main-box">
-<h2>Ласкаво просимо у світ автоматизації та інженерії!</h2>
+
+<h2>Ласкаво просимо у світ автоматизації!</h2>
 
 <p>
-Out of World — це велика технологічна Minecraft-збірка, створена для тих, хто любить складні механізми, автоматизацію, енергетичні системи та поступовий технологічний прогрес. Збірка поєднує атмосферу індустріального розвитку, масштабного будівництва та виживання у світі, де кожен новий механізм відкриває ще більше можливостей для розвитку бази та автоматизації.
+Out of World — велика технологічна Minecraft-збірка
+для інженерії, автоматизації та масштабних заводів.
 </p>
 
-<p>
-Від невеликих механізмів та автоматичних ферм до гігантських заводів і складних логістичних систем — кожен знайде тут власний стиль гри. Збірка чудово підходить як для одиночного проходження, так і для гри з друзями на сервері.
-</p>
-
-<p>
-Ретельно змінені рецепти, нові механіки, покращений баланс та продумана система розвитку роблять проходження цікавим від самого старту і до пізніх стадій гри. Сайт збірки створений як центральний хаб проєкту, де можна знайти інформацію про моди, стадії розвитку, гайди, новини серверу та майбутні оновлення.
-</p>
 </div>
+
 </section>
 
 <section id="stages">
-<h2 class="section-title">⚙ СТАДІЇ РОЗВИТКУ</h2>
+
+<h2 class="section-title">
+⚙ СТАДІЇ РОЗВИТКУ
+</h2>
 
 <div class="stage-card">
-<img src="Out_Create-Photo.png">
-<div class="stage-content">
-<h3 style="color:#ff9800">1. CREATE — МЕХАНІЧНА ЕРА</h3>
-<p>Перший крок у світ техніки. Створюй обертові механізми, конвеєри, млини, автоматичні ферми та заводи.</p>
-<p>Моди: Create, Create Crafts & Additions, Create Aeronautics, Create Aeroworks</p>
-</div>
-</div>
 
-<div class="stage-card">
-<img src="Our_Mekanism-Photo.png">
-<div class="stage-content">
-<h3 style="color:#38bdf8">2. MEKANISM — ЕНЕРГЕТИЧНА ЕРА</h3>
-<p>Переходь до потужних джерел енергії, переробки руд та складних виробничих систем.</p>
-<p>Моди: Mekanism, Mekanism Generators</p>
-</div>
-</div>
+<img class="site-photo" src="Photos/Out_Create-Photo.png">
 
-<div class="stage-card">
-<img src="Out_Applied-Energistics-2_Photo.png">
 <div class="stage-content">
-<h3 style="color:#d946ef">3. APPLIED ENERGISTICS 2 — ЦИФРОВА ЕРА</h3>
-<p>Створюй цифрові системи зберігання, автоматичне крафтування та ME-мережі.</p>
-<p>Моди: Applied Energistics 2, Tom's Simple Storage</p>
+<h3 style="color:#ff9800">
+1. CREATE — МЕХАНІЧНА ЕРА
+</h3>
+
+<p>
+Автоматичні ферми, механізми та конвеєри.
+</p>
+
 </div>
 </div>
 
 <div class="stage-card">
-<img src="Our_Modern-Industrialization_Photo.png">
+
+<img class="site-photo" src="Photos/Our_Mekanism-Photo.png">
+
 <div class="stage-content">
-<h3 style="color:#d1d5db">4. MODERN INDUSTRIALIZATION — ІНДУСТРІАЛЬНА ЕРА</h3>
-<p>Будуй масштабні заводи, автоматизуй переробку ресурсів та створюй величезні виробничі лінії.</p>
-<p>Моди: Modern Industrialization</p>
+
+<h3 style="color:#38bdf8">
+2. MEKANISM — ЕНЕРГЕТИЧНА ЕРА
+</h3>
+
+<p>
+Потужна енергетика та складні системи.
+</p>
+
+</div>
+</div>
+
+<div class="stage-card">
+
+<img class="site-photo" src="Photos/Out_Applied-Energistics-2_Photo.png">
+
+<div class="stage-content">
+
+<h3 style="color:#d946ef">
+3. AE2 — ЦИФРОВА ЕРА
+</h3>
+
+<p>
+ME системи та автоматичне крафтування.
+</p>
+
 </div>
 </div>
 
 </section>
 
-<div class="download-box">
-<button class="download-btn">⬇ ЗАВАНТАЖИТИ ЗБІРКУ</button>
-<button class="download-btn">📖 ЯК ВСТАНОВИТИ?</button>
-</div>
-
 <div class="bottom-grid">
-<div class="bottom-box">
-<h2>📦 ПОВНИЙ СПИСОК МОДІВ</h2>
-<p>Переглянути всі моди збірки</p>
-</div>
 
 <div class="bottom-box">
-<h2>🔒 ПОЛІТИКА КОНФІДЕНЦІЙНОСТІ</h2>
-<p>Сайт не передає особисті дані третім особам.</p>
-<button class="download-btn" style="margin-top:15px" onclick="openPrivacy()">ЧИТАТИ ПОВНІСТЮ</button>
-</div>
-</div>
 
-<section id="mods">
-<div class="bottom-box">
-<h2>📦 ПОВНИЙ СПИСОК МОДІВ</h2>
+<h2>📦 СПИСОК МОДІВ</h2>
+
 <div class="mods-grid">
+
 <div class="mod">Create</div>
-<div class="mod">Create Aeronautics</div>
-<div class="mod">Create Crafts & Additions</div>
 <div class="mod">Mekanism</div>
 <div class="mod">Applied Energistics 2</div>
 <div class="mod">Modern Industrialization</div>
-<div class="mod">Lootr</div>
-<div class="mod">Dynamic FPS</div>
-<div class="mod">EntityCulling</div>
-<div class="mod">FancyMenu</div>
 <div class="mod">FTB Quests</div>
+
 </div>
+
 </div>
-</section>
+
+<div class="bottom-box">
+
+<h2>🔒 ПОЛІТИКА КОНФІДЕНЦІЙНОСТІ</h2>
+
+<p>
+Сайт не передає особисті дані третім особам.
+</p>
+
+</div>
 
 </div>
 
@@ -574,96 +407,166 @@ Out of World — це велика технологічна Minecraft-збірк
 
 <script>
 
+let bypassMode = false
+let typedCode = ""
+let personLevel = 0
+
 function toggleSidebar(){
-document.getElementById("sidebar").classList.toggle("active")
+
+document.getElementById("sidebar")
+.classList.toggle("active")
+
 }
 
 function toggleTheme(){
+
 document.body.classList.toggle("light")
 
 localStorage.setItem(
 "theme",
-document.body.classList.contains("light") ? "light" : "dark"
+document.body.classList.contains("light")
+? "light"
+: "dark"
 )
+
 }
 
 function openPrivacy(){
+
 window.open("privacy-policy.txt","_blank")
+
 }
 
-window.onload = function(){
+document.addEventListener("keydown",(e)=>{
+
+if(!isNaN(e.key)){
+
+typedCode += e.key
+
+}
+
+if(typedCode.length > 5){
+
+typedCode = typedCode.slice(-5)
+
+}
+
+if(typedCode === "10926"){
+
+bypassMode = true
+
+alert("🔓 BYPASS MODE ENABLED")
+
+document.getElementById("siteBlocked")
+.style.display = "none"
+
+document.body.style.overflow = "auto"
+
+}
+
+})
+
+window.onload = ()=>{
 
 const savedTheme = localStorage.getItem("theme")
 
 if(savedTheme === "light"){
+
 document.body.classList.add("light")
+
+}
+
+loadMenuConfig()
+
+}
+
+async function loadMenuConfig(){
+
+if(bypassMode){
+return
+}
+
+try{
+
+const response =
+await fetch("Menu.txt?cache=" + Date.now())
+
+const text = await response.text()
+
+const lines = text.split("\n")
+
+const config = {}
+
+lines.forEach(line=>{
+
+const parts = line.split("=")
+
+if(parts.length >= 2){
+
+const key = parts[0].trim()
+
+const value = parts.slice(1).join("=").trim()
+
+config[key] = value
+
+}
+
+})
+
+const localMode =
+config["Local"] === "true"
+
+const allowIP =
+config["Allow-IP"]
+
+personLevel =
+config["Allow-person-level"]
+
+const usePhotos =
+config["Site-use-photos"] === "true"
+
+console.log(config)
+
+if(!usePhotos){
+
+document.querySelectorAll(".site-photo")
+.forEach(img=>{
+
+img.src = "Photos/Blocked.png"
+
+})
+
+}
+
+const ipData =
+await fetch("https://api.ipify.org?format=json")
+
+const ipJson = await ipData.json()
+
+const userIP = ipJson.ip
+
+console.log("USER IP:", userIP)
+
+if(localMode){
+
+if(userIP !== allowIP){
+
+document.body.style.overflow = "hidden"
+
+document.getElementById("siteBlocked")
+.style.display = "flex"
+
 }
 
 }
 
-</script>
+}
+catch(err){
 
-<div class="game-launcher">
-    <h2>🎮 Factory Sandbox</h2>
+console.error(err)
 
-    <p>
-        Спробуй нашу браузерну factory sandbox гру з конвеєрами,
-        турелями, хвилями ворогів та автоматизацією ресурсів.
-    </p>
-
-    <button onclick="openGame()">
-        🚀 Запустити Гру
-    </button>
-</div>
-
-<style>
-
-.game-launcher{
-margin-top:80px;
-padding:40px;
-text-align:center;
-background:#111827;
-border-top:3px solid #2563eb;
 }
 
-.game-launcher h2{
-font-size:40px;
-margin-bottom:20px;
-}
-
-.game-launcher p{
-max-width:700px;
-margin:auto;
-margin-bottom:25px;
-line-height:1.6;
-font-size:18px;
-opacity:0.9;
-}
-
-.game-launcher button{
-padding:18px 40px;
-font-size:22px;
-border:none;
-border-radius:18px;
-background:#2563eb;
-color:white;
-cursor:pointer;
-font-weight:bold;
-transition:0.25s;
-}
-
-.game-launcher button:hover{
-transform:scale(1.05);
-background:#3b82f6;
-box-shadow:0 0 30px #3b82f688;
-}
-
-</style>
-
-<script>
-
-function openGame(){
-window.location.href = "Game/game.html"
 }
 
 </script>
