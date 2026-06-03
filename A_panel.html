@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+
+<meta charset="UTF-8">
+
+<title>
+Admin Panel
+</title>
+
+<style>
+
+body{
+
+font-family:Segoe UI;
+background:#0f172a;
+color:white;
+padding:20px;
+
+}
+
+.panel{
+
+background:#111827;
+padding:20px;
+border-radius:15px;
+
+}
+
+table{
+
+width:100%;
+border-collapse:collapse;
+
+}
+
+td,th{
+
+border:1px solid #374151;
+padding:10px;
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div id="panel">
+
+Перевірка доступу...
+
+</div>
+
+<script>
+
+async function loadAdmin(){
+
+const response =
+await fetch(
+"Menu.txt?cache=" +
+Date.now()
+)
+
+const text =
+await response.text()
+
+const config = {}
+
+text.split(/\r?\n/)
+.forEach(line=>{
+
+const parts =
+line.split("=")
+
+if(parts.length >= 2){
+
+config[
+parts[0].trim()
+] =
+parts.slice(1)
+.join("=")
+.trim()
+
+}
+
+})
+
+const ipData =
+await fetch(
+"https://api.ipify.org?format=json"
+)
+
+const ipJson =
+await ipData.json()
+
+const userIP =
+ipJson.ip
+
+const role3 =
+(
+config["Role3-IP"]
+||
+""
+)
+.split(",")
+
+if(
+!role3.includes(userIP)
+){
+
+document.body.innerHTML =
+"<h1>⛔ Access Denied</h1>"
+
+return
+
+}
+
+const password =
+prompt(
+"Введіть пароль адміністратора"
+)
+
+if(
+password !==
+config["Admin-Password"]
+){
+
+document.body.innerHTML =
+"<h1>❌ Невірний пароль</h1>"
+
+return
+
+}
+
+document.getElementById(
+"panel"
+).innerHTML =
+
+`
+<div class="panel">
+
+<h1>
+Admin Panel
+</h1>
+
+<p>
+IP:
+${userIP}
+</p>
+
+<table>
+
+<tr>
+<th>Параметр</th>
+<th>Значення</th>
+</tr>
+
+<tr>
+<td>Local</td>
+<td>${config["Local"]}</td>
+</tr>
+
+<tr>
+<td>Whitelist</td>
+<td>${config["Whitelist-IP"]}</td>
+</tr>
+
+<tr>
+<td>Role1</td>
+<td>${config["Role1-IP"]}</td>
+</tr>
+
+<tr>
+<td>Role2</td>
+<td>${config["Role2-IP"]}</td>
+</tr>
+
+<tr>
+<td>Role3</td>
+<td>${config["Role3-IP"]}</td>
+</tr>
+
+<tr>
+<td>Photos</td>
+<td>${config["Site-use-photos"]}</td>
+</tr>
+
+</table>
+
+</div>
+`
+
+}
+
+loadAdmin()
+
+</script>
+
+</body>
+</html>
