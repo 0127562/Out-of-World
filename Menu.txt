@@ -1,3 +1,11 @@
 Local=true
-Allow-IP=78.25.4.1
+
+Admin-Password=1111
+
+Whitelist-IP=78.25.4.1,78.25.4.1,78.25.4.1
+
+Role1-IP=78.25.4.1
+Role2-IP=78.25.4.1
+Role3-IP=78.25.4.1
+
 Site-use-photos=true
