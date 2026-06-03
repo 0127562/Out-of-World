@@ -407,6 +407,168 @@ ME системи та автоматичне крафтування.
 
 <script>
 
+async function roleSystemInit(){
+
+try{
+
+const response =
+await fetch("Menu.txt?cache=" + Date.now())
+
+const text =
+await response.text()
+
+const config = {}
+
+text.split(/\r?\n/)
+.forEach(line=>{
+
+const parts = line.split("=")
+
+if(parts.length >= 2){
+
+config[
+parts[0].trim()
+] =
+parts.slice(1)
+.join("=")
+.trim()
+
+}
+
+})
+
+const ipData =
+await fetch(
+"https://api.ipify.org?format=json"
+)
+
+const ipJson =
+await ipData.json()
+
+const userIP =
+ipJson.ip
+
+const whitelist =
+(config["Whitelist-IP"] || "")
+.split(",")
+.map(x=>x.trim())
+.filter(Boolean)
+
+if(
+config["Local"] === "true"
+&&
+!whitelist.includes(userIP)
+){
+
+document.body.style.overflow =
+"hidden"
+
+document.getElementById(
+"siteBlocked"
+).style.display = "flex"
+
+return
+
+}
+
+let role = 0
+
+if(
+(config["Role1-IP"] || "")
+.split(",")
+.includes(userIP)
+){
+role = 1
+}
+
+if(
+(config["Role2-IP"] || "")
+.split(",")
+.includes(userIP)
+){
+role = 2
+}
+
+if(
+(config["Role3-IP"] || "")
+.split(",")
+.includes(userIP)
+){
+role = 3
+}
+
+window.currentRole = role
+
+const roleBox =
+document.createElement("div")
+
+roleBox.style.cssText =
+`
+position:fixed;
+bottom:15px;
+right:15px;
+background:#071226;
+padding:10px 15px;
+border-radius:12px;
+border:1px solid #2563eb;
+z-index:9999;
+`
+
+roleBox.innerHTML =
+"Role: " + role
+
+document.body.appendChild(
+roleBox
+)
+
+if(role === 3){
+
+const adminBtn =
+document.createElement("a")
+
+adminBtn.href =
+"A_panel.html"
+
+adminBtn.innerHTML =
+"🛠 Admin Panel"
+
+adminBtn.style.cssText =
+`
+position:fixed;
+bottom:60px;
+right:15px;
+background:#2563eb;
+color:white;
+padding:10px 15px;
+border-radius:12px;
+text-decoration:none;
+z-index:9999;
+`
+
+document.body.appendChild(
+adminBtn
+)
+
+}
+
+}
+catch(err){
+
+console.error(err)
+
+}
+
+}
+
+window.addEventListener(
+"load",
+roleSystemInit
+)
+
+</script>
+
+<script>
+
 let bypassMode = false
 let typedCode = ""
 let personLevel = 0
